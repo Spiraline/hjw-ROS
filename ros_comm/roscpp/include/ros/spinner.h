@@ -50,6 +50,8 @@ public:
    * \brief Spin on a callback queue (defaults to the global one).  Blocks until roscpp has been shutdown.
    */
   virtual void spin(CallbackQueue* queue = 0) = 0;
+
+  virtual void spin_p(CallbackQueue* queue = 0) = 0;
 };
 
 /**
@@ -59,6 +61,8 @@ class ROSCPP_DECL SingleThreadedSpinner : public Spinner
 {
 public:
   virtual void spin(CallbackQueue* queue = 0);
+
+  virtual void spin_p(CallbackQueue* queue = 0);
 };
 
 /**

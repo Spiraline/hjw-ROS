@@ -106,6 +106,8 @@ public:
    */
   void callAvailable(ros::WallDuration timeout);
 
+  void callAvailable_p(ros::WallDuration timeout);
+
   /**
    * \brief returns whether or not the queue is empty
    */

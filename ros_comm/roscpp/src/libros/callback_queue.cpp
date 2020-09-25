@@ -353,6 +353,63 @@ void CallbackQueue::callAvailable(ros::WallDuration timeout)
   }
 }
 
+void CallbackQueue::callAvailable_p(ros::WallDuration timeout)
+{
+  setupTLS();
+  TLS* tls = tls_.get();
+
+  {
+    boost::mutex::scoped_lock lock(mutex_);
+
+    if (!enabled_)
+    {
+      return;
+    }
+
+    if (callbacks_.empty())
+    {
+      if (!timeout.isZero())
+      {
+        condition_.wait_for(lock, boost::chrono::nanoseconds(timeout.toNSec()));
+      }
+
+      if (callbacks_.empty() || !enabled_)
+      {
+        return;
+      }
+    }
+
+    bool was_empty = tls->callbacks.empty();
+
+    tls->callbacks.insert(tls->callbacks.end(), callbacks_.begin(), callbacks_.end());
+    callbacks_.clear();
+
+    calling_ += tls->callbacks.size();
+
+    if (was_empty)
+    {
+      tls->cb_it = tls->callbacks.begin();
+    }
+  }
+
+  size_t called = 0;
+
+  while (!tls->callbacks.empty())
+  {
+    ROS_INFO("[%d] : TLS start", getpid());
+    if (callOneCB(tls) != Empty)
+    {
+      ++called;
+    }
+    ROS_INFO("[%d] : TLS end", getpid());
+  }
+
+  {
+    boost::mutex::scoped_lock lock(mutex_);
+    calling_ -= called;
+  }
+}
+
 CallbackQueue::CallOneResult CallbackQueue::callOneCB(TLS* tls)
 {
   // Check for a recursive call.  If recursive, increment the current iterator.  Otherwise

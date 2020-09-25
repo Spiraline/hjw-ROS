@@ -143,6 +143,29 @@ void SingleThreadedSpinner::spin(CallbackQueue* queue)
   spinner_monitor.remove(queue);
 }
 
+void SingleThreadedSpinner::spin_p(CallbackQueue* queue)
+{
+  if (!queue)
+  {
+    queue = getGlobalCallbackQueue();
+  }
+
+  if (!spinner_monitor.add(queue, true))
+  {
+    std::string errorMessage = "SingleThreadedSpinner: " + DEFAULT_ERROR_MESSAGE + " You might want to use a MultiThreadedSpinner instead.";
+    ROS_FATAL_STREAM(errorMessage);
+    throw std::runtime_error(errorMessage);
+  }
+
+  ros::WallDuration timeout(0.1f);
+  ros::NodeHandle n;
+  while (n.ok())
+  {
+    queue->callAvailable_p(timeout);
+  }
+  spinner_monitor.remove(queue);
+}
+
 MultiThreadedSpinner::MultiThreadedSpinner(uint32_t thread_count)
 : thread_count_(thread_count)
 {

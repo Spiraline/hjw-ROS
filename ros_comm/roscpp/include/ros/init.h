@@ -123,6 +123,8 @@ ROSCPP_DECL bool isShuttingDown();
  */
 ROSCPP_DECL void spin();
 
+ROSCPP_DECL void spin_p();
+
 /** \brief Enter simple event loop
  *
  * This method enters a loop, processing callbacks.  This method should only be used
@@ -136,6 +138,8 @@ ROSCPP_DECL void spin();
  * SingleThreadedSpinner and MultiThreadedSpinner
  */
 ROSCPP_DECL void spin(Spinner& spinner);
+
+ROSCPP_DECL void spin_p(Spinner& spinner);
 /**
  * \brief Process a single round of callbacks.
  *

@@ -107,6 +107,8 @@ static volatile bool g_shutting_down = false;
 static boost::recursive_mutex g_shutting_down_mutex;
 static boost::thread g_internal_queue_thread;
 
+std::string node_name;
+
 bool isInitialized()
 {
   return g_initialized;
@@ -555,6 +557,17 @@ void removeROSArgs(int argc, const char* const* argv, V_string& args_out)
       args_out.push_back(arg);
     }
   }
+}
+
+void spin_p()
+{
+  SingleThreadedSpinner s;
+  spin_p(s);
+}
+
+void spin_p(Spinner& s)
+{
+  s.spin_p();
 }
 
 void spin()
